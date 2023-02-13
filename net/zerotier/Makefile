@@ -61,21 +61,17 @@ endef
 TARGET_CFLAGS += -ffunction-sections -fdata-sections
 TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
 
-define Package/zerotier/conffiles
-/etc/config/zerotier
-endef
-
 define Package/zerotier/install
-	$(INSTALL_DIR) $(1)/usr/bin
+	$(INSTALL_DIR) $(1)/usr/bin $(1)/lib/netifd/proto $(1)/usr/share/zerotier
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/zerotier-one $(1)/usr/bin/
+	$(INSTALL_BIN) ./files/lib/netifd/proto/zerotier.sh $(1)/lib/netifd/proto/
+	$(CP) ./files/usr/share/zerotier/*.sh $(1)/lib/netifd/proto/
 	$(LN) zerotier-one $(1)/usr/bin/zerotier-cli
 	$(LN) zerotier-one $(1)/usr/bin/zerotier-idtool
 
 ifeq ($(CONFIG_ZEROTIER_ENABLE_SELFTEST),y)
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/zerotier-selftest $(1)/usr/bin/
 endif
-
-	$(CP) ./files/* $(1)/
 endef
 
 $(eval $(call BuildPackage,zerotier))
